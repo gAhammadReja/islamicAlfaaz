@@ -9,7 +9,7 @@ const Item = require('./itemModel'); // Import item schema
 
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 // Middleware to parse incoming request bodies
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Serve static files (admin login page and admin dashboard)
-app.use(express.static(path.join(__dirname, 'admin')));
+app.use(express.static(path.join(__dirname, '/')));
 
 // GET route to serve admin login page
 app.get('/', (req, res) => {
