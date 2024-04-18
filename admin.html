@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">My Website</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-5">
+        <h1>Items List</h1>
+        <ul id="itemList" class="list-group mt-3">
+            <!-- List items will be dynamically added here -->
+        </ul>
+    </main>
+
+    <main class="container mt-5 col-10 col-md-6 col-lg-5 card p-4">
+        <h1>Add New Item</h1>
+        <form id="addItemForm" action="http://localhost:8000/items" method="POST">
+            <div class="mb-3">
+                <label for="itemName" class="form-label">Name:</label>
+                <input type="text" class="form-control" id="itemName" name="itemName" required>
+            </div>
+            <div class="mb-3">
+                <label for="itemDescription" class="form-label">Description:</label>
+                <textarea class="form-control" id="itemDescription" name="itemDescription" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="itemLink" class="form-label">Link:</label>
+                <input type="text" class="form-control" id="itemLink" name="itemLink" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </main>
+    <footer class="mt-5 bg-dark text-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>About Me</h5>
+                    <p>I'm Golam Ahammad Reja, a web developer passionate about creating awesome web experiences.</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Contact Me</h5>
+                    <form id="contactForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message:</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p>Developer: Golam Ahammad Reja</p>
+                    <p>Email: reja535ahammad@gmail.com</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+
+    <script>
+        // Function to fetch items from the backend and display them on the page
+        async function fetchItems() {
+            try {
+                const response = await fetch('/items');
+                const data = await response.json();
+                const itemList = document.getElementById('itemList');
+
+                // Clear existing list items
+                itemList.innerHTML = '';
+
+                // Create list items for each item in the data array
+                data.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item');
+                    listItem.textContent = `${item.itemName} - ${item.itemDescription} - ${item.itemLink}`;
+
+                    // Create delete button with confirmation dialog
+                    const deleteButton = document.createElement('button');
+                    deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this item?')) {
+                            deleteItem(item._id);
+                        }
+                    });
+
+                    listItem.appendChild(deleteButton);
+                    itemList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching items:', error);
+            }
+        }
+
+        // Function to delete an item
+        async function deleteItem(itemId) {
+            try {
+                const response = await fetch(`/items/${itemId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                console.log('Item deleted:', data);
+
+                // Refresh the list after deletion
+                fetchItems();
+            } catch (error) {
+                console.error('Error deleting item:', error);
+            }
+        }
+
+        // Fetch items when the page loads
+        window.onload = fetchItems;
+    </script>
+
+
+</body>
+</html>
